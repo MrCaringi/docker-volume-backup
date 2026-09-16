@@ -138,10 +138,6 @@ For each stack defined in `config.json`:
 
 Errors are counted and reported in the final Telegram notification. If a stack fails to stop, it is skipped and the next stack continues.
 
-## Docker logs
-
-![Docker Logs](https://raw.githubusercontent.com/MrCaringi/docker-volume-backup/main/assets/docker-logs.jpg)
-
 ## Telegram notifications
 
 ![telegram notification](https://github.com/MrCaringi/assets/blob/main/images/scripts/container-backups/telegram-messages.jpg)
@@ -151,6 +147,8 @@ Errors are counted and reported in the final Telegram notification. If a stack f
 ```bash
 docker logs -f container-backups
 ```
+
+![Docker Logs](https://raw.githubusercontent.com/MrCaringi/docker-volume-backup/main/assets/docker-logs.jpg)
 
 ## Running a backup manually (without waiting for cron)
 
