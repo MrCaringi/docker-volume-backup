@@ -12,6 +12,8 @@ if [ ! -f /config/config.json ]; then
 fi
 
 echo "docker-volume-backup v${APP_VERSION} starting"
+echo "Timezone: ${TZ:-UTC}"
+echo "Container time: $(date)"
 echo "Schedule: ${CRON_SCHEDULE}"
 echo ""
 

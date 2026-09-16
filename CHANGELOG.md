@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.1] - 2026-09-16
+## [0.2.2] - 2026-09-16
 
 ### Added
 - `TZ` environment variable support for log timestamps and backup filenames (requires tzdata — now included in the image)
