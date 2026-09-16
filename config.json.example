@@ -1,0 +1,29 @@
+{
+    "config": {
+        "BackupDestination": "/backup"
+    },
+    "telegram": {
+        "ChatID": "your-chat-id",
+        "APIkey": "your-bot-api-key",
+        "MessageThreadID": "123"
+    },
+    "stacks": [
+        {
+            "name": "stack1",
+            "composeFile": "/stacks/myapp/docker-compose.yml",
+            "volumes": [
+                {
+                    "path": "/stacks/myapp/data",
+                    "maxBackups": 5,
+                    "preBackupSleep": 10
+                },
+                {
+                    "path": "/stacks/myapp/config",
+                    "maxBackups": 3
+                }
+            ]
+        }
+    ]
+}
+
+▎ Nota sobre rutas: BackupDestination usa /backup (el volumen del contenedor). Los paths de composeFile y volumes deben ser los paths tal como están montados dentro del contenedor — ver docker-compose.yml.
