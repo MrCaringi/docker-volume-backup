@@ -11,10 +11,10 @@ if [ ! -f /config/config.json ]; then
     exit 1
 fi
 
-echo "docker-volume-backup starting"
+echo "docker-volume-backup v${APP_VERSION} starting"
 echo "Schedule: ${CRON_SCHEDULE}"
 echo ""
 
-echo "${CRON_SCHEDULE} bash /usr/local/bin/container-backups.sh /config/config.json" > /etc/crontab
+echo "${CRON_SCHEDULE} /bin/bash /usr/local/bin/container-backups.sh /config/config.json" > /etc/crontab
 
 exec supercronic /etc/crontab

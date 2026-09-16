@@ -1,6 +1,7 @@
 FROM docker:cli
 
 ARG VERSION=dev
+ENV APP_VERSION=${VERSION}
 ARG REPO_URL=https://github.com/MrCaringi/docker-volume-backup
 
 ENV SUPERCRONIC_VERSION=0.2.33
