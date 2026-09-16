@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="v3.0.0"
+#SCRIPT_VERSION="v3.0.0"
 
 # Emoji definitions for status
 ICON_OK="✅"
@@ -21,8 +21,8 @@ LOG_FILE="/tmp/${HOSTNAME_SHORT}_${TIMESTAMP}.log"
 ERROR_COUNT=0
 
 # Write script version as the first line of the log
-echo "Container Backup Script version: $SCRIPT_VERSION"
-echo "Container Backup Script version: $SCRIPT_VERSION" > "$LOG_FILE"
+#echo "Container Backup Script version: $SCRIPT_VERSION"
+#echo "Container Backup Script version: $SCRIPT_VERSION" > "$LOG_FILE"
 echo "---   ---   ---   ---   ---   ---   ---"
 echo "---   ---   ---   ---   ---   ---   ---" >> "$LOG_FILE"
 
