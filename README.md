@@ -55,6 +55,7 @@ docker compose logs -f
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `CRON_SCHEDULE` | Yes | `0 2 * * *` | Cron expression for backup schedule |
+| `TZ` | No | `UTC` | Timezone for log timestamps and backup filenames (e.g. `America/Monterrey`, `Europe/Madrid`) |
 
 Verify your corntab expression in https://crontab.guru/
 

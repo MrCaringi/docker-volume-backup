@@ -4,7 +4,7 @@ ARG VERSION=dev
 ENV APP_VERSION=${VERSION}
 ARG REPO_URL=https://github.com/MrCaringi/docker-volume-backup
 
-RUN apk add --no-cache bash jq curl
+RUN apk add --no-cache bash jq curl tzdata
 
 COPY container-backups.sh /usr/local/bin/container-backups.sh
 COPY entrypoint.sh /entrypoint.sh
