@@ -1,7 +1,7 @@
 # docker-volume-backup
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MrCaringi/docker-volume-backup/main/assets/logo.png" width="150" alt="docker-volume-backup logo">
+  <img src="https://raw.githubusercontent.com/MrCaringi/docker-volume-backup/main/assets/logo.png" width="350" alt="docker-volume-backup logo">
 </p>
 
 Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, organized by stack. Runs as a Docker container with a configurable cron schedule — no host dependencies, no sudo required.
@@ -137,6 +137,10 @@ For each stack defined in `config.json`:
 7. Send Telegram notification with result and log file
 
 Errors are counted and reported in the final Telegram notification. If a stack fails to stop, it is skipped and the next stack continues.
+
+## Docker logs
+
+![Docker Logs](https://raw.githubusercontent.com/MrCaringi/docker-volume-backup/main/assets/docker-logs.jpg)
 
 ## Telegram notifications
 
