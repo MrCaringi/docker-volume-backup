@@ -3,7 +3,7 @@ services:
     image: mrcaringi/docker-volume-backup:latest
     container_name: container-backups
     hostname: myserver          # <-- cambiar por el nombre real del host (aparece en Telegram)
-    restart: unless-stopped
+    restart: always
     environment:
       CRON_SCHEDULE: "0 2 * * *"
     volumes:
@@ -13,4 +13,4 @@ services:
       # Los paths de los stacks deben montarse al MISMO path que aparece en config.json
       # para que docker compose -f <path> funcione desde dentro del contenedor.
       # Ejemplo: si config.json usa /stacks/myapp/docker-compose.yml:
-      # - /home/user/stacks:/stacks
+      - /home/user/docker/stacks:/home/user/docker/stacks:ro

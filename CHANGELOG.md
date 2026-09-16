@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.0] - 2026-09-16
+## [0.1.1] - 2026-09-16
 
 ### Added
 - Initial Docker containerization of container-backups.sh
