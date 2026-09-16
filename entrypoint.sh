@@ -15,6 +15,6 @@ echo "docker-volume-backup starting"
 echo "Schedule: ${CRON_SCHEDULE}"
 echo ""
 
-echo "${CRON_SCHEDULE} /usr/local/bin/container-backups.sh /config/config.json" > /etc/crontab
+echo "${CRON_SCHEDULE} bash /usr/local/bin/container-backups.sh /config/config.json" > /etc/crontab
 
 exec supercronic /etc/crontab
