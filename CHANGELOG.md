@@ -1,9 +1,15 @@
 # Changelog
 
-## [1.0.0] - 2026-09-16
+## [1.0.1] - 2026-09-16
 
 ### Added
-- First public version
+- ASCII art banner displayed on container startup
+- Timezone name (`$TZ`) and local container time shown in startup log — makes it easy to verify timezone configuration
+- Logo (`assets/logo.png`) for Docker Hub and GitHub
+- GitHub issue templates: Bug Report and Feature Request
+
+### Changed
+- README reorganized with Table of Contents and improved structure
 
 ## [0.2.2] - 2026-09-16
 
