@@ -9,6 +9,25 @@ Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, or
 ![Docker Pulls](https://img.shields.io/docker/pulls/mrcaringi/docker-volume-backup)
 ![Docker Image Size](https://img.shields.io/docker/image-size/mrcaringi/docker-volume-backup/latest)
 
+## Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+  - [Environment Variables](#environment-variables)
+  - [Volumes](#volumes)
+  - [config.json](#configjson)
+- [How it Works](#how-it-works)
+- [Usage](#usage)
+  - [Viewing Logs](#viewing-logs)
+  - [Running a Backup Manually](#running-a-backup-manually)
+  - [Backup Folder Structure](#backup-folder-structure)
+  - [Telegram Notifications](#telegram-notifications)
+- [Recovery](#recovery)
+- [Changelog](#changelog)
+
+---
+
 ## Features
 
 - Backs up Docker volumes **by stack** (not by individual container)
@@ -21,9 +40,10 @@ Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, or
 - Sends Telegram notifications (messages + log file), with optional thread support
 - Multi-arch image: `linux/amd64` and `linux/arm64` (Raspberry Pi, Oracle Ampere, x86)
 
-## Quick start
+---
 
-Docker compose example
+## Quick Start
+
 ```yaml
 # docker-compose.yml
 services:
@@ -34,6 +54,7 @@ services:
     restart: always
     environment:
       CRON_SCHEDULE: "0 2 * * *"
+      TZ: "Europe/Madrid"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./config.json:/config/config.json:ro
@@ -42,26 +63,23 @@ services:
       - /home/user/docker/stacks:/home/user/docker/stacks:ro
 ```
 
-Run the container:
 ```bash
 docker compose up -d
-```
-
-Get the logs
-```bash
 docker compose logs -f
 ```
 
+---
+
 ## Configuration
 
-### Environment variables
+### Environment Variables
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `CRON_SCHEDULE` | Yes | `0 2 * * *` | Cron expression for backup schedule |
 | `TZ` | No | `UTC` | Timezone for log timestamps and backup filenames (e.g. `America/Monterrey`, `Europe/Madrid`) |
 
-Verify your corntab expression in https://crontab.guru/
+> Verify your cron expression at [crontab.guru](https://crontab.guru/)
 
 ### Volumes
 
@@ -123,7 +141,9 @@ Verify your corntab expression in https://crontab.guru/
 | `stacks[].volumes[].maxBackups` | number | How many backups to keep per volume |
 | `stacks[].volumes[].preBackupSleep` | number (sec) | *(Optional)* Wait before backup — useful for DB flushes |
 
-## How it works
+---
+
+## How it Works
 
 For each stack defined in `config.json`:
 
@@ -136,13 +156,13 @@ For each stack defined in `config.json`:
 6. Start the stack: `docker compose -f <composeFile> up -d`
 7. Send Telegram notification with result and log file
 
-Errors are counted and reported in the final Telegram notification. If a stack fails to stop, it is skipped and the next stack continues.
+Errors are counted and reported in the final Telegram notification. If a stack fails to stop, it is skipped and the process continues with the next stack.
 
-## Telegram notifications
+---
 
-![telegram notification](https://github.com/MrCaringi/assets/blob/main/images/scripts/container-backups/telegram-messages.jpg)
+## Usage
 
-## Viewing logs
+### Viewing Logs
 
 ```bash
 docker logs -f container-backups
@@ -150,15 +170,24 @@ docker logs -f container-backups
 
 ![Docker Logs](https://raw.githubusercontent.com/MrCaringi/docker-volume-backup/main/assets/docker-logs.jpg)
 
-## Running a backup manually (without waiting for cron)
+### Running a Backup Manually
+
+
+To trigger a backup immediately without waiting for the cron schedule:
 
 ```bash
 docker exec container-backups /usr/local/bin/container-backups.sh /config/config.json
 ```
 
-## Backup folder structure
+### Backup Folder Structure
 
 ![folder structure](https://github.com/MrCaringi/assets/blob/main/images/scripts/container-backups/terminal-folder-structure.jpg)
+
+### Telegram Notifications
+
+![telegram notification](https://github.com/MrCaringi/assets/blob/main/images/scripts/container-backups/telegram-messages.jpg)
+
+---
 
 ## Recovery
 
@@ -189,6 +218,8 @@ sudo tar -xzpf /path/to/backup/stack1/volume1/volume1_250902-1900.tar.gz \
 ```bash
 docker compose -f /path/to/compose.yml up -d
 ```
+
+---
 
 ## Changelog
 
