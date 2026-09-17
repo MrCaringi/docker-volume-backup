@@ -51,6 +51,10 @@ echo "Timezone: ${TZ:-UTC}"
 echo "Container time: $(date)"
 echo "Schedule: ${CRON_SCHEDULE}"
 echo ""
+STACK_COUNT=$(jq '.stacks | length' /config/config.json)
+STACK_NAMES=$(jq -r '.stacks[].name' /config/config.json | tr '\n' ',' | sed 's/,$//')
+echo "Stacks to backup: ${STACK_COUNT} (${STACK_NAMES})"
+echo ""
 
 mkdir -p /etc/crontabs
 echo "${CRON_SCHEDULE} /bin/bash /usr/local/bin/container-backups.sh /config/config.json >> /proc/1/fd/1 2>&1" \

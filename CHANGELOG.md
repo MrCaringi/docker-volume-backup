@@ -1,5 +1,12 @@
 # Changelog
 
+## [v1.1.0] - 2026-09-16
+
+### Added
+- Startup log now shows the number of stacks defined in `config.json`
+  (`Stacks: N`) so you can confirm the correct config is mounted at a
+  glance, without opening the file.
+
 ## [1.0.1] - 2026-09-16
 
 ### Added
