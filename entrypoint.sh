@@ -47,13 +47,13 @@ cat << 'BANNER'
                                                                        
 BANNER
 echo "docker-volume-backup v${APP_VERSION} starting"
+echo ""
 echo "Timezone: ${TZ:-UTC}"
 echo "Container time: $(date)"
 echo "Schedule: ${CRON_SCHEDULE}"
-echo ""
 STACK_COUNT=$(jq '.stacks | length' /config/config.json)
 STACK_NAMES=$(jq -r '.stacks[].name' /config/config.json | tr '\n' ',' | sed 's/,$//')
-echo "Stacks to backup: ${STACK_COUNT} (${STACK_NAMES})"
+echo "Stacks in config.json: ${STACK_COUNT} (${STACK_NAMES})"
 echo ""
 
 mkdir -p /etc/crontabs
