@@ -1,7 +1,7 @@
 # docker-volume-backup
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MrCaringi/docker-volume-backup/main/assets/logo.png" width="350" alt="docker-volume-backup logo">
+  <img src="https://raw.githubusercontent.com/MrCaringi/docker-volume-backup/main/assets/logo.png" width="400" alt="docker-volume-backup logo">
 </p>
 
 Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, organized by stack. Runs as a Docker container with a configurable cron schedule — no host dependencies, no sudo required.
@@ -121,6 +121,16 @@ docker compose logs -f
                 },
                 {
                     "path": "/home/user/stacks/stack1/config",
+                    "maxBackups": 3
+                }
+            ]
+        },
+        {
+            "name": "stack2",
+            "composeFile": "/home/user/stacks/stack2/docker-compose.yml",
+            "volumes": [
+                {
+                    "path": "/mnt/services/stack2/config",
                     "maxBackups": 3
                 }
             ]
