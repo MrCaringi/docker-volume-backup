@@ -48,6 +48,7 @@ cat << 'BANNER'
 BANNER
 echo "docker-volume-backup v${APP_VERSION} starting"
 echo ""
+echo "Host: ${HOSTNAME}"
 echo "Timezone: ${TZ:-UTC}"
 echo "Container time: $(date)"
 echo "Schedule: ${CRON_SCHEDULE}"

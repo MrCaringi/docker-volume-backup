@@ -6,8 +6,12 @@
 
 Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, organized by stack. Runs as a Docker container with a configurable cron schedule — no host dependencies, no sudo required.
 
+<div align="center">
+
 ![Docker Pulls](https://img.shields.io/docker/pulls/mrcaringi/docker-volume-backup)
 ![Docker Image Size](https://img.shields.io/docker/image-size/mrcaringi/docker-volume-backup/latest)
+
+</div>
 
 ## Table of Contents
 
@@ -21,9 +25,10 @@ Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, or
 - [Usage](#usage)
   - [Viewing Logs](#viewing-logs)
   - [Running a Backup Manually](#running-a-backup-manually)
+  - [Recovery](#recovery)
+- [Screenshots](#screenshots)
   - [Backup Folder Structure](#backup-folder-structure)
   - [Telegram Notifications](#telegram-notifications)
-- [Recovery](#recovery)
 - [Changelog](#changelog)
 
 ---
@@ -79,7 +84,7 @@ docker compose logs -f
 | `CRON_SCHEDULE` | Yes | `0 2 * * *` | Cron expression for backup schedule |
 | `TZ` | No | `UTC` | Timezone for log timestamps and backup filenames (e.g. `America/Monterrey`, `Europe/Madrid`) |
 
-> Verify your cron expression at [crontab.guru](https://crontab.guru/)
+> Verify your cron expression at [CRONTAB GURU](https://crontab.guru/)
 
 ### Volumes
 
@@ -182,38 +187,27 @@ docker logs -f container-backups
 
 ### Running a Backup Manually
 
-
 To trigger a backup immediately without waiting for the cron schedule:
 
 ```bash
 docker exec container-backups /usr/local/bin/container-backups.sh /config/config.json
 ```
 
-### Backup Folder Structure
+### Recovery
 
-![folder structure](https://github.com/MrCaringi/assets/blob/main/images/scripts/container-backups/terminal-folder-structure.jpg)
-
-### Telegram Notifications
-
-![telegram notification](https://github.com/MrCaringi/assets/blob/main/images/scripts/container-backups/telegram-messages.jpg)
-
----
-
-## Recovery
-
-### 1. Inspect the backup
+#### 1. Inspect the backup
 
 ```bash
 tar -tvf stack1_volume1_250902-1900.tar.gz
 ```
 
-### 2. Stop the stack
+#### 2. Stop the stack
 
 ```bash
 docker compose -f /path/to/compose.yml down
 ```
 
-### 3. Extract the backup
+#### 3. Extract the backup
 
 Root is required to restore original file ownership:
 
@@ -223,11 +217,23 @@ sudo tar -xzpf /path/to/backup/stack1/volume1/volume1_250902-1900.tar.gz \
   -C /destination/path
 ```
 
-### 4. Start the stack
+#### 4. Start the stack
 
 ```bash
 docker compose -f /path/to/compose.yml up -d
 ```
+
+---
+
+## Screenshots
+
+### Backup Folder Structure
+
+![folder structure](https://github.com/MrCaringi/assets/blob/main/images/scripts/container-backups/terminal-folder-structure.jpg)
+
+### Telegram Notifications
+
+![telegram notification](https://github.com/MrCaringi/assets/blob/main/images/scripts/container-backups/telegram-messages.jpg)
 
 ---
 

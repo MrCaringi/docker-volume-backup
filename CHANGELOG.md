@@ -1,6 +1,12 @@
 # Changelog
 
-## [v1.1.0] - 2026-09-16
+## [1.2.0] - 2026-09-19
+
+### Added
+- Startup log now displays the container hostname (`Host: <hostname>`) — set via `hostname:` in `docker-compose.yml` to identify which server the backup is running on.
+
+
+## [1.1.0] - 2026-09-16
 
 ### Added
 - Startup log now shows the number of stacks defined in `config.json`
