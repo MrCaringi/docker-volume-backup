@@ -192,6 +192,18 @@ To trigger a backup immediately without waiting for the cron schedule:
 ```bash
 docker exec container-backups /usr/local/bin/container-backups.sh /config/config.json
 ```
+```bash
+docker run --rm \
+  -e CRON_SCHEDULE="*/2 * * * *" \
+  -v /home/user/stacks/docker-volume-backup/test.json:/config/config.json:ro \
+  -v /home/user/stacks:/home/user/stacks:ro \
+  -v /mnt/backups:/mnt/backups \
+  -v /mnt/services:/mnt/serives:ro \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  mrcaringi/docker-volume-backup:latest \
+  /usr/local/bin/container-backups.sh \
+  /config/config.json
+```
 
 ### Recovery
 
