@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.3.0] - 2026-11-01
+
+### Fixed
+- Config reload: documented volume mount changed from a single-file bind mount (`config.json:/config/config.json`) to a directory bind mount (`./config:/config`). Docker's single-file bind mounts track the original inode; if the host-side `config.json` was replaced via rename (editors doing atomic saves, `mv`, `scp`, sync tools), the container kept serving the old, deleted inode's content until restarted — even though `container-backups.sh` already re-read the file on every cron run. Mounting the directory removes this class of bug entirely. Existing deployments must move their `config.json` into a `config/` folder and update their `docker-compose.yml` accordingly.
+
+### Added
+- `container-backups.sh` now validates `config.json` at the start of every run; if it's missing or not valid JSON, it logs the error, sends a Telegram alert, and exits without stopping any stack.
+- `container-backups.sh` now logs the detected stack count and names at the start of every run (previously this was only logged once, at container startup, by `entrypoint.sh`), confirming which config was actually used for that run.
+
+
 ## [1.2.0] - 2026-09-19
 
 ### Added

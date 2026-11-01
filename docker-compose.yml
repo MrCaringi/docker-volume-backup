@@ -2,15 +2,15 @@ services:
   container-backups:
     image: mrcaringi/docker-volume-backup:latest
     container_name: container-backups
-    hostname: myserver          # <-- cambiar por el nombre real del host (aparece en Telegram)
+    hostname: myserver          # <-- change to the real host name (shown in Telegram)
     restart: always
     environment:
       CRON_SCHEDULE: "0 2 * * *"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./config.json:/config/config.json:ro
+      - ./config:/config:ro
       - /path/to/backups:/backup
-      # Los paths de los stacks deben montarse al MISMO path que aparece en config.json
-      # para que docker compose -f <path> funcione desde dentro del contenedor.
-      # Ejemplo: si config.json usa /stacks/myapp/docker-compose.yml:
+      # Stack paths must be mounted at the SAME path that appears in config.json
+      # so that docker compose -f <path> works from inside the container.
+      # Example: if config.json uses /stacks/myapp/docker-compose.yml:
       - /home/user/docker/stacks:/home/user/docker/stacks:ro

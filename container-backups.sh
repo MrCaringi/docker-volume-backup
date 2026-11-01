@@ -158,6 +158,18 @@ if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>
     exit 1
 fi
 
+# Validate config.json before touching any stack
+if ! jq empty "$CONFIG_FILE" >/dev/null 2>&1; then
+    log "$ICON_ERROR config.json at '$CONFIG_FILE' is missing or not valid JSON. Aborting without touching any stack."
+    send_telegram_message "Backup Status $ICON_ERROR" "config.json at '$CONFIG_FILE' is missing or not valid JSON. No stacks were stopped or backed up."
+    exit 1
+fi
+
+# Log which stacks were detected in this run (confirms the config actually in use)
+STACK_COUNT=$(jq '.stacks | length' "$CONFIG_FILE")
+STACK_NAMES=$(jq -r '.stacks[].name' "$CONFIG_FILE" | tr '\n' ',' | sed 's/,$//')
+log "$ICON_OK Stacks in config.json: ${STACK_COUNT} (${STACK_NAMES})"
+
 # Get backup destination path from config file
 BACKUP_DEST=$(jq -r '.config.BackupDestination' "$CONFIG_FILE")
 STACKS=$(jq -c '.stacks[]' "$CONFIG_FILE")

@@ -42,7 +42,9 @@ Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, or
 - Backs up the **entire folder containing the compose file**, not just the file itself
 - Supports per-volume delay before backup (`preBackupSleep`) — useful for database flushes
 - Logs backup size per volume and total per stack
+- Logs the stacks detected in config.json at the start of every run, confirming exactly which configuration was used
 - Sends Telegram notifications (messages + log file), with optional thread support
+- Validates config.json on every run before touching any stack — logs an error and sends a Telegram alert, then exits without stopping anything, if the file is missing or not valid JSON
 - Multi-arch image: `linux/amd64` and `linux/arm64` (Raspberry Pi, Oracle Ampere, x86)
 
 ---
@@ -62,7 +64,7 @@ services:
       TZ: "Europe/Madrid"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./config.json:/config/config.json:ro
+      - ./config:/config:ro
       - /path/to/backups:/backup
       # Mount stack directories at the same path used in config.json
       - /home/user/docker/stacks:/home/user/docker/stacks:ro
@@ -91,7 +93,7 @@ docker compose logs -f
 | Container path | Description | Required |
 |---|---|---|
 | `/var/run/docker.sock` | Docker socket — needed to stop/start stacks | Yes |
-| `/config/config.json` | Your configuration file | Yes |
+| `/config` | Directory containing your `config.json` | Yes |
 | `/backup` | Backup destination directory | Yes |
 | `<stack paths>` | Directories containing your stacks' compose files and volumes | Yes |
 
@@ -101,6 +103,8 @@ docker compose logs -f
 > ```yaml
 > - /home/user/stacks:/home/user/stacks:ro
 > ```
+
+> **Mount a directory, not a file:** `/config` must be a directory bind mount (e.g. `./config:/config:ro`), not a single-file mount. Docker's single-file bind mounts track the original inode — if the host-side `config.json` is replaced via rename (common for editors doing atomic saves, `mv`, `scp`, or sync tools), the container keeps serving the old, deleted inode's content indefinitely, even though `container-backups.sh` already re-reads the file on every run. A directory mount avoids this entirely: config changes take effect on the very next scheduled run, no container restart required.
 
 ### config.json
 
@@ -195,10 +199,10 @@ docker exec container-backups /usr/local/bin/container-backups.sh /config/config
 ```bash
 docker run --rm \
   -e CRON_SCHEDULE="*/2 * * * *" \
-  -v /home/user/stacks/docker-volume-backup/test.json:/config/config.json:ro \
+  -v /home/user/stacks/docker-volume-backup/testconfig:/config:ro \
   -v /home/user/stacks:/home/user/stacks:ro \
   -v /mnt/backups:/mnt/backups \
-  -v /mnt/services:/mnt/serives:ro \
+  -v /mnt/services:/mnt/services:ro \
   -v /var/run/docker.sock:/var/run/docker.sock \
   mrcaringi/docker-volume-backup:latest \
   /usr/local/bin/container-backups.sh \
