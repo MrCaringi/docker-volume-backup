@@ -29,6 +29,7 @@ Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, or
 - [Screenshots](#screenshots)
   - [Backup Folder Structure](#backup-folder-structure)
   - [Telegram Notifications](#telegram-notifications)
+- [Migrating from v1.x to v2.0.0](#migrating-from-v1x-to-v200)
 - [Changelog](#changelog)
 
 ---
@@ -44,6 +45,7 @@ Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, or
 - Logs backup size per volume and total per stack
 - Logs the stacks detected in config.json at the start of every run, confirming exactly which configuration was used
 - Sends Telegram notifications (messages + log file), with optional thread support
+- Routes success and error notifications to separate Telegram chats/threads, with the option to suppress success notifications entirely to cut down on noise — error notifications are always sent regardless, so a misconfiguration can't leave you blind to real failures
 - Validates config.json on every run before touching any stack — logs the error (visible via `docker logs`) and exits without stopping anything if the file is missing or not valid JSON
 - Multi-arch image: `linux/amd64` and `linux/arm64` (Raspberry Pi, Oracle Ampere, x86)
 
@@ -114,9 +116,16 @@ docker compose logs -f
         "BackupDestination": "/backup"
     },
     "telegram": {
-        "ChatID": "your-chat-id",
-        "APIkey": "your-telegram-bot-api-key",
-        "MessageThreadID": "123"
+        "APIkey": "your-bot-api-key",
+        "SuccessNotification": {
+            "enabled": true,
+            "ChatID": "your-chat-id",
+            "MessageThreadID": "123"
+        },
+        "ErrorNotification": {
+            "ChatID": "your-chat-id",
+            "MessageThreadID": "123"
+        }
     },
     "stacks": [
         {
@@ -151,9 +160,12 @@ docker compose logs -f
 | Parameter | Type | Description |
 |---|---|---|
 | `config.BackupDestination` | path | Maps to `/backup` inside the container |
-| `telegram.ChatID` | number | Telegram chat/group ID (use `@getmyid_bot`) |
 | `telegram.APIkey` | string | Telegram bot API key |
-| `telegram.MessageThreadID` | number | *(Optional)* Thread ID for group topics |
+| `telegram.SuccessNotification.enabled` | boolean | Set to `false` to suppress the "all OK" message and log file entirely |
+| `telegram.SuccessNotification.ChatID` | string | Telegram chat/group ID for success notifications |
+| `telegram.SuccessNotification.MessageThreadID` | string | *(Optional)* Thread ID for success notifications |
+| `telegram.ErrorNotification.ChatID` | string | Telegram chat/group ID for error notifications — always sent, cannot be suppressed |
+| `telegram.ErrorNotification.MessageThreadID` | string | *(Optional)* Thread ID for error notifications |
 | `stacks[].name` | string | Stack name — used as subfolder in the backup destination |
 | `stacks[].composeFile` | path | Path to the compose file *(as seen inside the container)* |
 | `stacks[].volumes[].path` | path | Volume directory to back up *(as seen inside the container)* |
@@ -250,6 +262,39 @@ docker compose -f /path/to/compose.yml up -d
 ### Telegram Notifications
 
 ![telegram notification](https://github.com/MrCaringi/assets/blob/main/images/scripts/container-backups/telegram-messages.jpg)
+
+---
+
+## Migrating from v1.x to v2.0.0
+
+**Breaking change:** the `telegram` block in `config.json` was restructured to support separate success/error destinations. The flat `telegram.ChatID` and `telegram.MessageThreadID` fields no longer work.
+
+Before (v1.x):
+```json
+"telegram": {
+    "ChatID": "your-chat-id",
+    "APIkey": "your-bot-api-key",
+    "MessageThreadID": "123"
+}
+```
+
+After (v2.0.0):
+```json
+"telegram": {
+    "APIkey": "your-bot-api-key",
+    "SuccessNotification": {
+        "enabled": true,
+        "ChatID": "your-chat-id",
+        "MessageThreadID": "123"
+    },
+    "ErrorNotification": {
+        "ChatID": "your-chat-id",
+        "MessageThreadID": "123"
+    }
+}
+```
+
+A `config.json` still using the old schema is detected on every run and the script aborts before touching any stack — check `docker logs` for a message pointing back to this section. No Telegram alert is sent in that case, since the broken telegram config is exactly what can't be read.
 
 ---
 

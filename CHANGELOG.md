@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.0] - 2026-11-01
+
+### BREAKING CHANGES
+- The `telegram` block in `config.json` was restructured: `telegram.ChatID` and `telegram.MessageThreadID` are replaced by `telegram.SuccessNotification.{enabled,ChatID,MessageThreadID}` and `telegram.ErrorNotification.{ChatID,MessageThreadID}`. `telegram.APIkey` stays at the top level. Configs written for v1.x will not work — see the README's "Migrating from v1.x to v2.0.0" section. The script detects the old/incomplete schema on every run and aborts without touching any stack (logged only, no Telegram alert, since the broken telegram config is what failed to validate).
+
+### Added
+- Success and error backup notifications can now be routed to different Telegram chats/threads.
+- `telegram.SuccessNotification.enabled` suppresses the "all OK" message and its attached log file entirely, so Telegram only gets noisy when something actually needs attention. Error notifications are always sent regardless of this setting, by design.
+
+### Fixed
+- Per-stack stop/start failure messages during a run now actually include the failure detail in the Telegram message body (previously `send_telegram_message` was called with only one argument, so the detail text was silently dropped).
+
+
 ## [1.3.0] - 2026-11-01
 
 ### Fixed

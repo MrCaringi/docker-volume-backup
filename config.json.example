@@ -3,9 +3,16 @@
         "BackupDestination": "/backup"
     },
     "telegram": {
-        "ChatID": "your-chat-id",
         "APIkey": "your-bot-api-key",
-        "MessageThreadID": "123"
+        "SuccessNotification": {
+            "enabled": true,
+            "ChatID": "your-chat-id",
+            "MessageThreadID": "123"
+        },
+        "ErrorNotification": {
+            "ChatID": "your-chat-id",
+            "MessageThreadID": "123"
+        }
     },
     "stacks": [
         {

@@ -36,11 +36,21 @@ log() {
 
 # Function to send Telegram message
 send_telegram_message() {
-    local HEADER="$1"
-    local MESSAGE="$2"
-    local CHAT_ID=$(jq -r '.telegram.ChatID' "$CONFIG_FILE")
+    local CHANNEL="$1"   # "SuccessNotification" or "ErrorNotification"
+    local HEADER="$2"
+    local MESSAGE="$3"
+
+    if [ "$CHANNEL" == "SuccessNotification" ]; then
+        local ENABLED
+        ENABLED=$(jq -r '.telegram.SuccessNotification.enabled' "$CONFIG_FILE")
+        if [ "$ENABLED" != "true" ]; then
+            return 0
+        fi
+    fi
+
+    local CHAT_ID=$(jq -r ".telegram.${CHANNEL}.ChatID" "$CONFIG_FILE")
     local API_KEY=$(jq -r '.telegram.APIkey' "$CONFIG_FILE")
-    local THREAD_ID=$(jq -r '.telegram.MessageThreadID // empty' "$CONFIG_FILE")
+    local THREAD_ID=$(jq -r ".telegram.${CHANNEL}.MessageThreadID // empty" "$CONFIG_FILE")
 
     local CURL_ARGS=(
         --data parse_mode=HTML
@@ -57,11 +67,21 @@ send_telegram_message() {
 
 # Function to send file via Telegram
 send_telegram_file() {
-    local FILE="$1"
-    local HEADER="$2"
-    local CHAT_ID=$(jq -r '.telegram.ChatID' "$CONFIG_FILE")
+    local CHANNEL="$1"   # "SuccessNotification" or "ErrorNotification"
+    local FILE="$2"
+    local HEADER="$3"
+
+    if [ "$CHANNEL" == "SuccessNotification" ]; then
+        local ENABLED
+        ENABLED=$(jq -r '.telegram.SuccessNotification.enabled' "$CONFIG_FILE")
+        if [ "$ENABLED" != "true" ]; then
+            return 0
+        fi
+    fi
+
+    local CHAT_ID=$(jq -r ".telegram.${CHANNEL}.ChatID" "$CONFIG_FILE")
     local API_KEY=$(jq -r '.telegram.APIkey' "$CONFIG_FILE")
-    local THREAD_ID=$(jq -r '.telegram.MessageThreadID // empty' "$CONFIG_FILE")
+    local THREAD_ID=$(jq -r ".telegram.${CHANNEL}.MessageThreadID // empty" "$CONFIG_FILE")
 
     local CURL_ARGS=(
         -F "chat_id=${CHAT_ID}"
@@ -164,6 +184,15 @@ if ! jq empty "$CONFIG_FILE" >/dev/null 2>&1; then
     exit 1
 fi
 
+# Validate the v2.0.0 telegram schema (SuccessNotification / ErrorNotification)
+API_KEY_CHECK=$(jq -r '.telegram.APIkey // empty' "$CONFIG_FILE")
+SUCCESS_CHAT_CHECK=$(jq -r '.telegram.SuccessNotification.ChatID // empty' "$CONFIG_FILE")
+ERROR_CHAT_CHECK=$(jq -r '.telegram.ErrorNotification.ChatID // empty' "$CONFIG_FILE")
+if [ -z "$API_KEY_CHECK" ] || [ -z "$SUCCESS_CHAT_CHECK" ] || [ -z "$ERROR_CHAT_CHECK" ]; then
+    log "$ICON_ERROR config.json does not match the v2.0.0 telegram schema (requires telegram.APIkey, telegram.SuccessNotification.ChatID and telegram.ErrorNotification.ChatID). If you're upgrading from v1.x, see the README migration note. Aborting without touching any stack."
+    exit 1
+fi
+
 # Log which stacks were detected in this run (confirms the config actually in use)
 STACK_COUNT=$(jq '.stacks | length' "$CONFIG_FILE")
 STACK_NAMES=$(jq -r '.stacks[].name' "$CONFIG_FILE" | tr '\n' ',' | sed 's/,$//')
@@ -187,7 +216,7 @@ for stack in $STACKS; do
     log "$ICON_WARNING Stopping stack '$STACK_NAME' with compose file $COMPOSE_FILE"
     if ! docker compose -f "$COMPOSE_FILE" down >> "$LOG_FILE" 2>&1; then
         log "$ICON_ERROR Failed to stop stack '$STACK_NAME'."
-        send_telegram_message "Failed to stop stack '$STACK_NAME' before backup."
+        send_telegram_message "ErrorNotification" "Backup Error $ICON_ERROR" "Failed to stop stack '$STACK_NAME' before backup."
         ERROR_COUNT=$((ERROR_COUNT+1))
         continue
     fi
@@ -219,7 +248,7 @@ for stack in $STACKS; do
     log "$ICON_WARNING Starting stack '$STACK_NAME' with compose file $COMPOSE_FILE"
     if ! docker compose -f "$COMPOSE_FILE" up -d >> "$LOG_FILE" 2>&1; then
         log "$ICON_ERROR Failed to start stack '$STACK_NAME' after backup."
-        send_telegram_message "Failed to start stack '$STACK_NAME' after backup."
+        send_telegram_message "ErrorNotification" "Backup Error $ICON_ERROR" "Failed to start stack '$STACK_NAME' after backup."
         ERROR_COUNT=$((ERROR_COUNT+1))
         continue
     fi
@@ -230,20 +259,22 @@ done
 
 # Send final notification
 if [ $ERROR_COUNT -eq 0 ]; then
+    CHANNEL="SuccessNotification"
     STATUS_ICON="$ICON_OK"
     STATUS_MSG="All backups completed successfully"
 else
+    CHANNEL="ErrorNotification"
     STATUS_ICON="$ICON_ERROR"
     STATUS_MSG="$ERROR_COUNT error(s) occurred during the process"
 fi
 
 HEADER="Backup Status $STATUS_ICON"
-send_telegram_message "$HEADER" "$STATUS_MSG"
+send_telegram_message "$CHANNEL" "$HEADER" "$STATUS_MSG"
 
 # Add error count to the end of the log file before sending
 echo "Total errors: $ERROR_COUNT" >> "$LOG_FILE"
 
-send_telegram_file "$LOG_FILE" "Backup Log $STATUS_ICON"
+send_telegram_file "$CHANNEL" "$LOG_FILE" "Backup Log $STATUS_ICON"
 
 log "Process finished with $ERROR_COUNT error(s)"
 exit $ERROR_COUNT
