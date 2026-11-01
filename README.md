@@ -44,7 +44,7 @@ Backs up Docker volumes and `docker-compose.yml` files as `.tar.gz` archives, or
 - Logs backup size per volume and total per stack
 - Logs the stacks detected in config.json at the start of every run, confirming exactly which configuration was used
 - Sends Telegram notifications (messages + log file), with optional thread support
-- Validates config.json on every run before touching any stack — logs an error and sends a Telegram alert, then exits without stopping anything, if the file is missing or not valid JSON
+- Validates config.json on every run before touching any stack — logs the error (visible via `docker logs`) and exits without stopping anything if the file is missing or not valid JSON
 - Multi-arch image: `linux/amd64` and `linux/arm64` (Raspberry Pi, Oracle Ampere, x86)
 
 ---

@@ -160,8 +160,7 @@ fi
 
 # Validate config.json before touching any stack
 if ! jq empty "$CONFIG_FILE" >/dev/null 2>&1; then
-    log "$ICON_ERROR config.json at '$CONFIG_FILE' is missing or not valid JSON. Aborting without touching any stack."
-    send_telegram_message "Backup Status $ICON_ERROR" "config.json at '$CONFIG_FILE' is missing or not valid JSON. No stacks were stopped or backed up."
+    log "$ICON_ERROR config.json at '$CONFIG_FILE' is missing or not valid JSON. Aborting without touching any stack. (No Telegram alert here — the bot credentials also live in this file.)"
     exit 1
 fi
 
