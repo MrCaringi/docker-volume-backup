@@ -42,7 +42,7 @@ send_telegram_message() {
 
     if [ "$CHANNEL" == "SuccessNotification" ]; then
         local ENABLED
-        ENABLED=$(jq -r '.telegram.SuccessNotification.enabled' "$CONFIG_FILE")
+        ENABLED=$(jq -r '.telegram.SuccessNotification.enabled | if . == null then true else . end' "$CONFIG_FILE")
         if [ "$ENABLED" != "true" ]; then
             return 0
         fi
@@ -73,7 +73,7 @@ send_telegram_file() {
 
     if [ "$CHANNEL" == "SuccessNotification" ]; then
         local ENABLED
-        ENABLED=$(jq -r '.telegram.SuccessNotification.enabled' "$CONFIG_FILE")
+        ENABLED=$(jq -r '.telegram.SuccessNotification.enabled | if . == null then true else . end' "$CONFIG_FILE")
         if [ "$ENABLED" != "true" ]; then
             return 0
         fi

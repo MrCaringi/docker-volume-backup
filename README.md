@@ -161,7 +161,7 @@ docker compose logs -f
 |---|---|---|
 | `config.BackupDestination` | path | Maps to `/backup` inside the container |
 | `telegram.APIkey` | string | Telegram bot API key |
-| `telegram.SuccessNotification.enabled` | boolean | Set to `false` to suppress the "all OK" message and log file entirely |
+| `telegram.SuccessNotification.enabled` | boolean | *(Optional, defaults to `true`)* Set to `false` to suppress the "all OK" message and log file entirely |
 | `telegram.SuccessNotification.ChatID` | string | Telegram chat/group ID for success notifications |
 | `telegram.SuccessNotification.MessageThreadID` | string | *(Optional)* Thread ID for success notifications |
 | `telegram.ErrorNotification.ChatID` | string | Telegram chat/group ID for error notifications — always sent, cannot be suppressed |
